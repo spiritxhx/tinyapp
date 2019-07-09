@@ -8,8 +8,6 @@ const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
 };
 
-
-
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
@@ -53,9 +51,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get('/urls/:shortURL', (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render('urls_show.ejs', templateVars);
-  console.log(urlDatabase[req.params.shortURL]);
-  
-  // res.redirect(urlDatabase[req.params.shortURL]);
+
 });
 
 app.get('/hello', (req, res) => {
