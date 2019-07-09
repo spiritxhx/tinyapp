@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const generateRandomString = () => {
@@ -20,7 +23,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    username: req.cookies["name"]
+    // ... any other vars
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -35,7 +42,11 @@ app.post("/urls/:id/update", (req, res) => {
   res.redirect(`/urls`);
 });
 app.get('/urls/:shortURL/update', (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  let templateVars = {
+    username: req.cookies['name'],
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL]
+  };
   res.render('urls_show.ejs', templateVars);
 });
 
@@ -44,7 +55,11 @@ app.get('/urls.json', (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = {
+    username: req.cookies['name'],
+    urls: urlDatabase
+  };
+  console.log(req.cookies);
   res.render("urls_index", templateVars);
 });
 
@@ -54,13 +69,24 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  let templateVars = {
+    username: req.cookies['name'],
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL]
+  };
+
+
   res.render('urls_show.ejs', templateVars);
 });
 
 //dealing with the delete operation
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
+  res.redirect('/urls');
+});
+
+app.post("/login", (req, res) => {
+  res.cookie('name', req.body.username);
   res.redirect('/urls');
 });
 
