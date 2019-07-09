@@ -31,8 +31,8 @@
             <td><%= url %></td>
             <td><%= urls[url] %></td>
             <td>
-              <form action='/urls/<%= url %>' method='GET'>
-                <button class='text-capitalize btn-outline-primary btn'>edit</button>
+              <form action='/urls/<%= url %>/update' method='GET'>
+                <input class='text-capitalize btn-outline-primary btn' value='edit' type='submit'>
               </form>
             </td>
             <td>

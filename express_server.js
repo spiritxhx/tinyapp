@@ -30,9 +30,13 @@ app.post("/urls", (req, res) => {
 });
 
 //dealing with the updating stuff
-app.post("/urls/:id", (req, res) => {
+app.post("/urls/:id/update", (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect(`/urls`);
+});
+app.get('/urls/:shortURL/update', (req, res) => {
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  res.render('urls_show.ejs', templateVars);
 });
 
 app.get('/urls.json', (req, res) => {
