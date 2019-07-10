@@ -7,12 +7,20 @@ app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.set('view engine', 'ejs');
+
+/////////////global functions/////////////////////
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
 };
-
-app.set('view engine', 'ejs');
-//--------------data------------------------------
+let randomId = generateRandomString(10);
+const emailCheck = email => {
+  for (const user in users) {
+    if (users[user].email === email) return false;
+  }
+  return true;
+};
+/////////////////data//////////////////////////
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -30,7 +38,7 @@ const users = {
     password: "dishwasher-funk"
   }
 };
-//--------------------------------------------------
+///////////////////////////////////////////////
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -38,7 +46,7 @@ app.get("/", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["name"]
+    user: users[randomId]
   };
   res.render("urls_new", templateVars);
 });
@@ -56,7 +64,7 @@ app.post("/urls/:id/update", (req, res) => {
 });
 app.get('/urls/:shortURL/update', (req, res) => {
   let templateVars = {
-    username: req.cookies['name'],
+    user: users[randomId],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
@@ -69,7 +77,7 @@ app.get('/urls.json', (req, res) => {
 
 app.get('/urls', (req, res) => {
   let templateVars = {
-    username: req.cookies['name'],
+    user: users[randomId],
     urls: urlDatabase
   };
   res.render("urls_index", templateVars);
@@ -82,16 +90,14 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   let templateVars = {
-    username: req.cookies['name'],
+    user: users[randomId],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
-
-
   res.render('urls_show.ejs', templateVars);
 });
 
-//dealing with the delete operation
+//dealing with the delete operation/////////////
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
@@ -102,16 +108,22 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 app.post("/register", (req, res) => {
-  let randomId = generateRandomString(10);
-  users[randomId] = {
-    id: randomId,
-    email: req.body.email,
-    password: req.body.password
-  };
-  res.cookie("user_id", randomId);
-  res.redirect("/urls");
+  if (req.body.email === "" || req.body.password === "") {
+    res.status(400).send('Email or Password cannot be Empty!');
+  } else if (!emailCheck(req.body.email)) {
+    res.status(400).send("Email has been registered!!");
+  } else {
+    users[randomId] = {
+      id: randomId,
+      email: req.body.email,
+      password: req.body.password
+    };
+    res.cookie("user_id", randomId);
+    res.redirect("/urls");
+  }
 });
 
+///////////////////////////////////////////////////
 
 //Login/////////////////////////////////////////////
 //GONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
