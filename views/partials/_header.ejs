@@ -11,11 +11,18 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <div class="ml-auto p-2 bd-highlight">
+        <% if (username) { %>
+        <form class="form-inline" method="POST" action="/logout">
+          <span class="text-light" style="width: 200px; margin: 1em">Logged in As: <%=username %></span>
+          <button type="submit" class="btn btn-outline-light">Log out</button>
+        </form>
+        <% } else { %>
         <form class="form-inline" method="POST" action="/login">
           <input class="form-control" type="text" name="username" style="width: 200px; margin: 1em"
             placeholder="username">
-          <button type="submit" class="btn btn-outline-dark">Sign in</button>
+          <button type="submit" class="btn btn-outline-dark">Log in</button>
         </form>
+        <% } %>
       </div>
     </div>
   </nav>
