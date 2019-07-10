@@ -20,14 +20,23 @@ const emailCheck = email => {
   }
   return { valid: false };
 };
+const urlsForUser = id => {
+  let urls = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      urls[shortURL] = urlDatabase[shortURL].longURL;
+    }
+  }
+  return urls;
+};
 /////////////////data//////////////////////////
 const urlDatabase = {
-  'userRandomID': {
-    shortURL: "b2xVn2",
+  'b2xVn2': {
+    userID: "userRandomID",
     longURL: "http://www.lighthouselabs.ca"
   },
-  'user2RandomID': {
-    shortURL: "9sm5xK",
+  '9sm5xK': {
+    userID: "user2RandomID",
     longURL: "http://www.google.com"
   }
 };
@@ -44,7 +53,7 @@ const users = {
     password: "123qweasd"
   }
 };
-///////////////////////////////////////////////
+///////////////end of data////////////////////
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -86,13 +95,17 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+///////////////main page for urls//////////////////
 app.get('/urls', (req, res) => {
   let templateVars = {
     user: users[req.cookies['user_id']],
-    urls: urlDatabase
+    urls: urlsForUser(req.cookies['user_id'])
   };
+  console.log(req.cookies['user_id']);
+  
   res.render("urls_index", templateVars);
 });
+///////////////end of main page/////////////////////
 
 
 app.get("/u/:shortURL", (req, res) => {
@@ -158,7 +171,7 @@ app.post("/login", (req, res) => {
   }
   res.status(403).send('something wrong with email or password!');
 });
-///////////////////////////////////////////////////
+//////////////////end of login/////////////////////
 
 
 //logout//////////////////////////////////////////////////
