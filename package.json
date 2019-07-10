@@ -19,10 +19,13 @@
   },
   "homepage": "https://github.com/spiritxhx/tinyapp#readme",
   "dependencies": {
+    "bcrypt": "2.0.0",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "ejs": "^2.6.2",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "nan": "^2.14.0",
+    "node-pre-gyp": "^0.13.0"
   },
   "devDependencies": {
     "nodemon": "^1.19.1"

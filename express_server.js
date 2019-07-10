@@ -3,6 +3,10 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
+// const password = "purple-monkey-dinosaur"; // found in the req.params object
+
+
 app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -45,12 +49,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "qweasd123"
+    password: '$2b$10$ZabpvwOD3mCj2HDO8YVk.eXkX.6yBopUQlT6oSi6HZ.pXJ3nP67n.'
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "123qweasd"
+    password: '$2b$10$95.oxeeHSMH373qiKdaE1uiTdR/8BN5Wymy8nEOXOw8.wZiMXlo7a'
   }
 };
 ///////////////end of data////////////////////
@@ -120,7 +124,7 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show.ejs', templateVars);
 });
 
-//dealing with the delete operation/////////////
+///////dealing with the delete operation/////////////
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (req.cookies['user_id'] === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
@@ -145,7 +149,7 @@ app.post("/register", (req, res) => {
     users[randomId] = {
       id: randomId,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10)
     };
     res.cookie("user_id", randomId);
     res.redirect("/urls");
@@ -164,7 +168,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   let { email, password } = req.body;
   if (emailCheck(email).valid) {
-    if (users[emailCheck(email).user].password === password) {
+    if (bcrypt.compareSync(password, users[emailCheck(email).user].password)) {
       res.cookie('user_id', emailCheck(email).user);
       res.redirect('/urls');
       return;
