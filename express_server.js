@@ -46,7 +46,8 @@ app.get("/", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    user: users[randomId]
+    users,
+    userId: req.cookies['user_id']
   };
   res.render("urls_new", templateVars);
 });
@@ -64,7 +65,8 @@ app.post("/urls/:id/update", (req, res) => {
 });
 app.get('/urls/:shortURL/update', (req, res) => {
   let templateVars = {
-    user: users[randomId],
+    users,
+    userId: req.cookies['user_id'],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
@@ -77,7 +79,8 @@ app.get('/urls.json', (req, res) => {
 
 app.get('/urls', (req, res) => {
   let templateVars = {
-    user: users[randomId],
+    users,
+    userId: req.cookies['user_id'],
     urls: urlDatabase
   };
   res.render("urls_index", templateVars);
@@ -90,7 +93,8 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   let templateVars = {
-    user: users[randomId],
+    users,
+    userId: req.cookies['user_id'],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
@@ -103,9 +107,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 });
 
-//enter user registration page/////////////////////
+/////////////////registration page/////////////////////
 app.get("/register", (req, res) => {
-  res.render("register");
+  let templateVars = {
+    users,
+    userId: req.cookies['user_id']
+  };
+  res.render("register", templateVars);
 });
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
@@ -126,13 +134,32 @@ app.post("/register", (req, res) => {
 ///////////////////////////////////////////////////
 
 //Login/////////////////////////////////////////////
-//GONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+app.get("/login", (req, res) => {
+  let templateVars = {
+    users,
+    userId: req.cookies['user_id']
+  };
+  res.render("login", templateVars);
+});
+app.post("/login", (req, res) => {
+  let { email, password } = req.body;
+  for (const user in users) {
+    if (users[user].email === email) {
+      if (users[user].password === password) {
+        res.cookie('user_id', user);
+        res.redirect('/urls');
+        return;
+      }
+    }
+  }
+  res.status(403).send('something wrong with email or password!');
+});
 ///////////////////////////////////////////////////
 
 
 //logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('name');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
