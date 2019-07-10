@@ -97,18 +97,25 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 });
 
-//enter user registration page-------------------
-app.get("/register", (req, res)=> {
-  res.render("/register");
+//enter user registration page/////////////////////
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+app.post("/register", (req, res) => {
+  let randomId = generateRandomString(10);
+  users[randomId] = {
+    id: randomId,
+    email: req.body.email,
+    password: req.body.password
+  };
+  res.cookie("user_id", randomId);
+  res.redirect("/urls");
 });
 
 
-//Login--------------------------------------
-app.post("/login", (req, res) => {
-  res.cookie('name', req.body.username);
-  res.redirect('/urls');
-});
-//---------------------------------------
+//Login/////////////////////////////////////////////
+//GONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+///////////////////////////////////////////////////
 
 
 //logout
