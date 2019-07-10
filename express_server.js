@@ -16,9 +16,9 @@ const generateRandomString = () => {
 let randomId = generateRandomString(10);
 const emailCheck = email => {
   for (const user in users) {
-    if (users[user].email === email) return false;
+    if (users[user].email === email) return { valid: true, user };
   }
-  return true;
+  return { valid: false };
 };
 /////////////////data//////////////////////////
 const urlDatabase = {
@@ -58,7 +58,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${short}`);
 });
 
-//dealing with the updating stuff
+//dealing with the updating stuff/////////////////////
 app.post("/urls/:id/update", (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   res.redirect(`/urls`);
@@ -118,7 +118,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send('Email or Password cannot be Empty!');
-  } else if (!emailCheck(req.body.email)) {
+  } else if (emailCheck(req.body.email).valid) {
     res.status(400).send("Email has been registered!!");
   } else {
     users[randomId] = {
@@ -143,13 +143,11 @@ app.get("/login", (req, res) => {
 });
 app.post("/login", (req, res) => {
   let { email, password } = req.body;
-  for (const user in users) {
-    if (users[user].email === email) {
-      if (users[user].password === password) {
-        res.cookie('user_id', user);
-        res.redirect('/urls');
-        return;
-      }
+  if (emailCheck(email).valid) {
+    if (users[emailCheck(email).user].password === password) {
+      res.cookie('user_id', emailCheck(email).user);
+      res.redirect('/urls');
+      return;
     }
   }
   res.status(403).send('something wrong with email or password!');
@@ -157,11 +155,12 @@ app.post("/login", (req, res) => {
 ///////////////////////////////////////////////////
 
 
-//logout
+//logout//////////////////////////////////////////////////
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
+////////////////////////////////////////////////////////////
 
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World<b></body></html>\n');
