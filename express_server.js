@@ -62,8 +62,7 @@ app.get("/", (req, res) => {
 app.get("/urls/new", (req, res) => {
   if (req.cookies['user_id']) {
     let templateVars = {
-      users,
-      userId: req.cookies['user_id']
+      user: users[req.cookies['user_id']]
     };
     res.render("urls_new", templateVars);
   } else {
@@ -79,14 +78,16 @@ app.post("/urls", (req, res) => {
 
 //dealing with the updating stuff/////////////////////
 app.post("/urls/:id/update", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+  if (req.cookies['user_id'] === urlDatabase[req.params.id].userID) {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+  }
   res.redirect(`/urls`);
 });
 app.get('/urls/:shortURL/update', (req, res) => {
   let templateVars = {
     user: users[req.cookies['user_id']],
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]
+    longURL: urlDatabase[req.params.shortURL].longURL
   };
   res.render('urls_show.ejs', templateVars);
 });
@@ -101,15 +102,13 @@ app.get('/urls', (req, res) => {
     user: users[req.cookies['user_id']],
     urls: urlsForUser(req.cookies['user_id'])
   };
-  console.log(req.cookies['user_id']);
-  
   res.render("urls_index", templateVars);
 });
 ///////////////end of main page/////////////////////
 
 
 app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL]);
+  res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
 app.get('/urls/:shortURL', (req, res) => {
@@ -123,7 +122,9 @@ app.get('/urls/:shortURL', (req, res) => {
 
 //dealing with the delete operation/////////////
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
+  if (req.cookies['user_id'] === urlDatabase[req.params.shortURL].userID) {
+    delete urlDatabase[req.params.shortURL];
+  }
   res.redirect('/urls');
 });
 
