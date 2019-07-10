@@ -11,19 +11,17 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <div class="ml-auto p-2 bd-highlight">
-        <% if (users[userId]) { %>
+        <% if (user) { %>
         <form class="form-inline" method="POST" action="/logout">
-          <span style="width:300px;">Logged in As: <%=users[userId].email %></span>
+          <span style="width:300px;">Logged in As: <%=user.email %></span>
           <button style="width:100px;" type="submit" class="btn btn-outline-dark">Log out</button>
         </form>
         <% } else { %>
         <span class="form-inline">
-          <form method="GET" action="/login">
-            <button style="width:100px;" type="submit" class="btn btn-outline-dark">Log in</button>
-          </form>
-          <form method="GET" action="/register">
-            <button style="width:100px;" type="submit" class="btn btn-outline-dark">Register</button>
-          </form>
+          <div class="navbar-nav">
+            <a class="navbar-brand nav-link" href="/login">Log in</a>
+            <a class="navbar-brand nav-link" href="/register">Register</a>
+          </div>
         </span>
         <% } %>
       </div>
