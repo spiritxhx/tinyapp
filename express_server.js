@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 // const password = "purple-monkey-dinosaur"; // found in the req.params object
 const cookieSession = require('cookie-session');
+const { getUserByEmail } = require('./helpers');
 
 
 app.use(cookieSession({
@@ -24,12 +25,12 @@ const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
 };
 
-const emailCheck = email => {
-  for (const user in users) {
-    if (users[user].email === email) return { valid: true, user };
-  }
-  return { valid: false };
-};
+// const getUserByEmail = email => {
+//   for (const user in users) {
+//     if (users[user].email === email) return { valid: true, user };
+//   }
+//   return { valid: false };
+// };
 const urlsForUser = id => {
   let urls = {};
   for (const shortURL in urlDatabase) {
@@ -150,7 +151,7 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send('Email or Password cannot be Empty!');
-  } else if (emailCheck(req.body.email).valid) {
+  } else if (getUserByEmail(req.body.email, users).valid) {
     res.status(400).send("Email has been registered!!");
   } else {
     let randomId = generateRandomString();
@@ -176,10 +177,10 @@ app.get("/login", (req, res) => {
 });
 app.post("/login", (req, res) => {
   let { email, password } = req.body;
-  if (emailCheck(email).valid) {
-    if (bcrypt.compareSync(password, users[emailCheck(email).user].password)) {
-      // res.cookie('user_id', emailCheck(email).user);
-      req.session['user_id'] = emailCheck(email).user;
+  if (getUserByEmail(email, users).valid) {
+    if (bcrypt.compareSync(password, users[getUserByEmail(email, users).user].password)) {
+      // res.cookie('user_id', getUserByEmail(email).user);
+      req.session['user_id'] = getUserByEmail(email, users).user;
       res.redirect('/urls');
       return;
     }
