@@ -21,6 +21,14 @@
     </button>
   </div>
   <% } %>
+  <% if (Object.keys(urls).length === 0 && user) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    Please <a href="/urls/new" class="alert-link">create new shortURLs</a> to have your list!
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <% } %>
   <main style="margin: 1em;">
     <h3 class="text-center">My URLs</h3>
     <table class="table">
@@ -34,12 +42,11 @@
       </thead>
       <tbody>
         <% for(let url in urls) { %>
-
         <tr>
           <td><%= url %></td>
           <td><%= urls[url] %></td>
           <td>
-            <form action='/urls/<%= url %>/update' method='GET'>
+            <form action='/urls/<%= url %>' method='GET'>
               <input class='text-capitalize btn-outline-primary btn' value='edit' type='submit'>
             </form>
           </td>

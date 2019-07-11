@@ -43,8 +43,22 @@ const users = {
   }
 };
 
+//root page for the application
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login');
+  }
+});
+
+//main page for urls
+app.get('/urls', (req, res) => {
+  let templateVars = {
+    user: users[req.session.user_id],
+    urls: urlsForUser(req.session.user_id, urlDatabase)
+  };
+  res.render("urls_index", templateVars);
 });
 
 //create new shortURLS
@@ -59,6 +73,29 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
+//filter the URLs based on user
+app.get('/urls/:shortURL', (req, res) => {
+  let templateVars = {
+    user: users[req.session.user_id],
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL].longURL
+  };
+  if (urlDatabase[req.params.shortURL].userID !== req.session.user_id) {
+    res.send("You don't have the access to this resouce!");
+  } else {
+    res.render('urls_show.ejs', templateVars);
+  }
+});
+
+//jump to the real website
+app.get("/u/:shortURL", (req, res) => {
+  if (urlDatabase[req.params.shortURL]) {
+    res.redirect(urlDatabase[req.params.shortURL].longURL);
+  } else {
+    res.status(404).send('Page not exist!');
+  }
+});
+
 app.post("/urls", (req, res) => {
   let short = generateRandomString();
   urlDatabase[short] = {};
@@ -68,49 +105,14 @@ app.post("/urls", (req, res) => {
 });
 
 //dealing with the updating stuff
-app.post("/urls/:id/update", (req, res) => {
+app.post("/urls/:id", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].longURL = req.body.longURL;
+  } else if (req.session.user_id && req.session.user_id !== urlDatabase[req.params.id].userID) {
+    res.send("You don't have the access to this resouce!");
+    return;
   }
   res.redirect(`/urls`);
-});
-
-//update page
-app.get('/urls/:shortURL/update', (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id],
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL
-  };
-  res.render('urls_show.ejs', templateVars);
-});
-
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
-
-//main page for urls
-app.get('/urls', (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id],
-    urls: urlsForUser(req.session.user_id, urlDatabase)
-  };
-  res.render("urls_index", templateVars);
-});
-
-//jump to the real website
-app.get("/u/:shortURL", (req, res) => {
-  res.redirect(urlDatabase[req.params.shortURL].longURL);
-});
-
-//filter the URLs based on user
-app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id],
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL
-  };
-  res.render('urls_show.ejs', templateVars);
 });
 
 //dealing with the delete operation
@@ -121,12 +123,20 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+app.get('/urls.json', (req, res) => {
+  res.json(urlDatabase);
+});
+
 //registration page
 app.get("/register", (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id]
-  };
-  res.render("register", templateVars);
+  if (!req.session.user_id) {
+    let templateVars = {
+      user: users[req.session.user_id]
+    };
+    res.render("register", templateVars);
+  } else {
+    res.redirect('/urls');
+  }
 });
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
@@ -147,10 +157,14 @@ app.post("/register", (req, res) => {
 
 //Login
 app.get("/login", (req, res) => {
-  let templateVars = {
-    user: users[req.cookies['user_id']]
-  };
-  res.render("login", templateVars);
+  if (!req.session.user_id) {
+    let templateVars = {
+      user: users[req.session.user_id]
+    };
+    res.render("login", templateVars);
+  } else {
+    res.redirect('/urls');
+  }
 });
 app.post("/login", (req, res) => {
   let { email, password } = req.body;
