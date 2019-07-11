@@ -25,11 +25,13 @@ app.set('view engine', 'ejs');
 const urlDatabase = {
   'b2xVn2': {
     userID: "userRandomID",
-    longURL: "http://www.lighthouselabs.ca"
+    longURL: "http://www.lighthouselabs.ca",
+    visitTimes: 0
   },
   '9sm5xK': {
     userID: "user2RandomID",
-    longURL: "http://www.google.com"
+    longURL: "http://www.google.com",
+    visitTimes: 0
   }
 };
 
@@ -81,7 +83,8 @@ app.get('/urls/:shortURL', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL
+    longURL: urlDatabase[req.params.shortURL].longURL,
+    times: urlDatabase[req.params.shortURL].visitTimes
   };
   if (urlDatabase[req.params.shortURL].userID !== req.session.user_id) {
     res.send("You don't have the access to this resouce!");
@@ -93,17 +96,20 @@ app.get('/urls/:shortURL', (req, res) => {
 //jump to the real website
 app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL]) {
+    urlDatabase[req.params.shortURL].visitTimes++;
     res.redirect(urlDatabase[req.params.shortURL].longURL);
   } else {
     res.status(404).send('Page not exist!');
   }
 });
 
+//create new URLs
 app.post("/urls", (req, res) => {
   let short = generateRandomString();
   urlDatabase[short] = {};
   urlDatabase[short].longURL = req.body.longURL;
   urlDatabase[short].userID = req.session.user_id;
+  urlDatabase[short].visitTimes = 0;
   res.redirect(`/urls/${short}`);
 });
 
