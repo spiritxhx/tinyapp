@@ -6,11 +6,14 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
+const methodOverride = require('method-override');
 
 app.use(cookieSession({
   name: 'session',
   keys: ['Idontwanttosetupastupitkey', 'Ihavetosetupthestupitkeys'],
 }));
+
+app.use(methodOverride('_method'));
 
 app.use(cookieParser());
 
@@ -105,7 +108,7 @@ app.post("/urls", (req, res) => {
 });
 
 //dealing with the updating stuff
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].longURL = req.body.longURL;
   } else if (req.session.user_id && req.session.user_id !== urlDatabase[req.params.id].userID) {
@@ -116,9 +119,12 @@ app.post("/urls/:id", (req, res) => {
 });
 
 //dealing with the delete operation
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL/delete", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
+  } else if (req.session.user_id && req.session.user_id !== urlDatabase[req.params.id].userID) {
+    res.send("You don't have the access to this resouce!");
+    return;
   }
   res.redirect('/urls');
 });
