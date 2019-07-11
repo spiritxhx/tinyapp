@@ -16,7 +16,7 @@ In the edit page, users can edit the longURL of the shortURL, and users can see 
 !["log in with no shortURLs"](https://github.com/spiritxhx/tinyapp/blob/master/img/noShortURLs.png)
 When users logged in with no shortURLs on their own, the app will ask user to create a new shortURL. 
 
-!["edit without logged in"](https://github.com/spiritxhx/tinyapp/blob/master/img/urls.png)
+!["edit without logged in"](https://github.com/spiritxhx/tinyapp/blob/master/img/notLoggeIn.png)
 When users who did not log in try to create a nre shortURL, it will redirect them to the login page bacause this function is for logged in users only. 
 
 ## Dependencies
