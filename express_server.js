@@ -25,12 +25,6 @@ const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
 };
 
-// const getUserByEmail = email => {
-//   for (const user in users) {
-//     if (users[user].email === email) return { valid: true, user };
-//   }
-//   return { valid: false };
-// };
 const urlsForUser = id => {
   let urls = {};
   for (const shortURL in urlDatabase) {
