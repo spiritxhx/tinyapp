@@ -41,11 +41,13 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
+    //original password is "qweasd123"
     password: '$2b$10$ZabpvwOD3mCj2HDO8YVk.eXkX.6yBopUQlT6oSi6HZ.pXJ3nP67n.'
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
+    //original password is "123qweasd"
     password: '$2b$10$95.oxeeHSMH373qiKdaE1uiTdR/8BN5Wymy8nEOXOw8.wZiMXlo7a'
   }
 };
