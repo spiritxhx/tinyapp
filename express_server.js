@@ -4,10 +4,8 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
-// const password = "purple-monkey-dinosaur"; // found in the req.params object
 const cookieSession = require('cookie-session');
-const { getUserByEmail } = require('./helpers');
-
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 
 app.use(cookieSession({
   name: 'session',
@@ -20,21 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set('view engine', 'ejs');
 
-/////////////global functions/////////////////////
-const generateRandomString = () => {
-  return Math.random().toString(36).substring(2, 8);
-};
-
-const urlsForUser = id => {
-  let urls = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      urls[shortURL] = urlDatabase[shortURL].longURL;
-    }
-  }
-  return urls;
-};
-/////////////////data//////////////////////////
+//data for urls and users
 const urlDatabase = {
   'b2xVn2': {
     userID: "userRandomID",
@@ -58,12 +42,12 @@ const users = {
     password: '$2b$10$95.oxeeHSMH373qiKdaE1uiTdR/8BN5Wymy8nEOXOw8.wZiMXlo7a'
   }
 };
-///////////////end of data////////////////////
 
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//create new shortURLS
 app.get("/urls/new", (req, res) => {
   if (req.session.user_id) {
     let templateVars = {
@@ -83,13 +67,15 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${short}`);
 });
 
-//dealing with the updating stuff/////////////////////
+//dealing with the updating stuff
 app.post("/urls/:id/update", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].longURL = req.body.longURL;
   }
   res.redirect(`/urls`);
 });
+
+//update page
 app.get('/urls/:shortURL/update', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
@@ -103,21 +89,21 @@ app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
-///////////////main page for urls//////////////////
+//main page for urls
 app.get('/urls', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
-    urls: urlsForUser(req.session.user_id)
+    urls: urlsForUser(req.session.user_id, urlDatabase)
   };
   res.render("urls_index", templateVars);
 });
-///////////////end of main page/////////////////////
 
-
+//jump to the real website
 app.get("/u/:shortURL", (req, res) => {
   res.redirect(urlDatabase[req.params.shortURL].longURL);
 });
 
+//filter the URLs based on user
 app.get('/urls/:shortURL', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
@@ -127,7 +113,7 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show.ejs', templateVars);
 });
 
-///////dealing with the delete operation/////////////
+//dealing with the delete operation
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
@@ -135,7 +121,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 });
 
-/////////////////registration page/////////////////////
+//registration page
 app.get("/register", (req, res) => {
   let templateVars = {
     user: users[req.session.user_id]
@@ -159,9 +145,7 @@ app.post("/register", (req, res) => {
   }
 });
 
-///////////////////////////////////////////////////
-
-//Login/////////////////////////////////////////////
+//Login
 app.get("/login", (req, res) => {
   let templateVars = {
     user: users[req.cookies['user_id']]
@@ -179,15 +163,12 @@ app.post("/login", (req, res) => {
   }
   res.status(403).send('something wrong with email or password!');
 });
-//////////////////end of login/////////////////////
 
-
-//logout//////////////////////////////////////////////////
+//logout, clear the cookies
 app.post("/logout", (req, res) => {
   res.clearCookie('session');
   res.redirect('/urls');
 });
-////////////////////////////////////////////////////////////
 
 app.get('/hello', (req, res) => {
   res.send('<html><body>Hello <b>World<b></body></html>\n');
