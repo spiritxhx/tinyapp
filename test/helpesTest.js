@@ -22,4 +22,9 @@ describe('getUserByEmail', () => {
     // Write your assert statement here
     assert.equal(user, expectedOutput);
   });
+  it('should return undefined if the user is not in the database', ()=>{
+    const user = getUserByEmail("123@example.com", testUsers).user;
+    const expectedOutput = undefined;
+    assert.equal(user, expectedOutput);
+  });
 });

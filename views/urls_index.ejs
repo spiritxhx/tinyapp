@@ -13,6 +13,14 @@
 
 <body>
   <% include ./partials/_header %>
+  <% if (!user) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    Please <a href="/login" class="alert-link">log in</a> to have full access
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <% } %>
   <main style="margin: 1em;">
     <h3>My URLs</h3>
     <table class="table">
@@ -26,21 +34,21 @@
       </thead>
       <tbody>
         <% for(let url in urls) { %>
-        
-          <tr>
-            <td><%= url %></td>
-            <td><%= urls[url] %></td>
-            <td>
-              <form action='/urls/<%= url %>/update' method='GET'>
-                <input class='text-capitalize btn-outline-primary btn' value='edit' type='submit'>
-              </form>
-            </td>
-            <td>
-              <form action='/urls/<%= url %>/delete' method='POST'>
-                <button class='text-capitalize btn-outline-danger btn'>delete</button>
-              </form>
-            </td>
-          </tr>
+
+        <tr>
+          <td><%= url %></td>
+          <td><%= urls[url] %></td>
+          <td>
+            <form action='/urls/<%= url %>/update' method='GET'>
+              <input class='text-capitalize btn-outline-primary btn' value='edit' type='submit'>
+            </form>
+          </td>
+          <td>
+            <form action='/urls/<%= url %>/delete' method='POST'>
+              <button class='text-capitalize btn-outline-danger btn'>delete</button>
+            </form>
+          </td>
+        </tr>
         </form>
         <% } %>
       </tbody>

@@ -154,7 +154,6 @@ app.post("/register", (req, res) => {
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10)
     };
-    // res.cookie("user_id", randomId);
     req.session['user_id'] = randomId;
     res.redirect("/urls");
   }
@@ -173,7 +172,6 @@ app.post("/login", (req, res) => {
   let { email, password } = req.body;
   if (getUserByEmail(email, users).valid) {
     if (bcrypt.compareSync(password, users[getUserByEmail(email, users).user].password)) {
-      // res.cookie('user_id', getUserByEmail(email).user);
       req.session['user_id'] = getUserByEmail(email, users).user;
       res.redirect('/urls');
       return;

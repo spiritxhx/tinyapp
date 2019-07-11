@@ -13,18 +13,24 @@
 
 <body>
   <% include ./partials/_header %>
-  <form method="POST" action="/register">
-    <div class="form-group">
-      <h2>Create Accout</h2>
-      <label class="text-capitalize">email address</label>
-      <input type="email" class="form-control" name="email" placeholder="Enter Email" style="width:300px;">
-    </div>
-    <div class="form-group">
-      <label class="text-capitalize">password</label>
-      <input type="password" class="form-control" name="password" placeholder="Password" style="width:300px;">
-    </div>
-    <button type="submit" class="btn btn-primary text-capitalize">submit</button>
-  </form>
+  <div class="container d-flex justify-content-center align-items-center">
+    <form method="POST" action="/register">
+      <div class="form-group pt-5">
+        <div class="text-center">
+          <h2>Create Accout</h2>
+        </div>
+        <label class="text-capitalize pt-3">email address</label>
+        <input type="email" class="form-control" name="email" placeholder="Enter Email" style="width:300px;">
+      </div>
+      <div class="form-group pb-3">
+        <label class="text-capitalize">password</label>
+        <input type="password" class="form-control" name="password" placeholder="Password" style="width:300px;">
+      </div>
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary text-capitalize">submit</button>
+      </div>
+    </form>
+  </div>
 
 
   <!-- Bootstrap JS -->
