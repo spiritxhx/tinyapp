@@ -26,12 +26,14 @@ const urlDatabase = {
   'b2xVn2': {
     userID: "userRandomID",
     longURL: "http://www.lighthouselabs.ca",
-    visitTimes: 0
+    visitTimes: 0,
+    uniqueVisit: []
   },
   '9sm5xK': {
     userID: "user2RandomID",
     longURL: "http://www.google.com",
-    visitTimes: 0
+    visitTimes: 0,
+    uniqueVisit: []
   }
 };
 
@@ -66,7 +68,7 @@ app.get('/urls', (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-//create new shortURLS
+//render create new shortURLS page
 app.get("/urls/new", (req, res) => {
   if (req.session.user_id) {
     let templateVars = {
@@ -78,18 +80,22 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-//filter the URLs based on user
+//pass data to URLs update page
 app.get('/urls/:shortURL', (req, res) => {
-  let templateVars = {
-    user: users[req.session.user_id],
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    times: urlDatabase[req.params.shortURL].visitTimes
-  };
-  if (urlDatabase[req.params.shortURL].userID !== req.session.user_id) {
-    res.send("You don't have the access to this resouce!");
+  if (urlDatabase[req.params.shortURL]) {
+    let templateVars = {
+      user: users[req.session.user_id],
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      times: urlDatabase[req.params.shortURL].visitTimes
+    };
+    if (urlDatabase[req.params.shortURL].userID !== req.session.user_id) {
+      res.send("You don't have the access to this resouce!");
+    } else {
+      res.render('urls_show.ejs', templateVars);
+    }
   } else {
-    res.render('urls_show.ejs', templateVars);
+    res.status(404).send('Page not exist!');
   }
 });
 
@@ -110,6 +116,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[short].longURL = req.body.longURL;
   urlDatabase[short].userID = req.session.user_id;
   urlDatabase[short].visitTimes = 0;
+  urlDatabase[short].uniqueVisit = [];
   res.redirect(`/urls/${short}`);
 });
 
