@@ -13,8 +13,10 @@
       <div class="ml-auto p-2 bd-highlight">
         <% if (user) { %>
         <form class="form-inline" method="POST" action="/logout">
-          <span style="width:300px;">Logged in As: <%=user.email %></span>
-          <button style="width:100px;" type="submit" class="btn btn-outline-dark">Log out</button>
+          <span class="nav-item nav-link text-dark" style="width:300px;"><strong>Logged in As:
+              <%=user.email %></strong></span>
+          <button class="btn btn-warning" style="width:100px;" type="submit" class="btn btn-outline-dark">Log
+            out</button>
         </form>
         <% } else { %>
         <span class="form-inline">
@@ -27,4 +29,12 @@
       </div>
     </div>
   </nav>
+  <% if (!user) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    Please <a href="/login" class="alert-link">log in</a> to have full access
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <% } %>
 </header>

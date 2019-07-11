@@ -11,9 +11,6 @@ const cookieSession = require('cookie-session');
 app.use(cookieSession({
   name: 'session',
   keys: ['Idontwanttosetupastupitkey', 'Ihavetosetupthestupitkeys'],
-
-  // Cookie Options
-  // maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
 app.use(cookieParser());
@@ -73,7 +70,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  if (req.cookies['user_id']) {
+  if (req.session.user_id) {
     let templateVars = {
       user: users[req.session.user_id]
     };
@@ -85,7 +82,9 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req, res) => {
   let short = generateRandomString();
-  urlDatabase[short] = req.body.longURL;
+  urlDatabase[short] = {};
+  urlDatabase[short].longURL = req.body.longURL;
+  urlDatabase[short].userID = req.session.user_id;
   res.redirect(`/urls/${short}`);
 });
 
@@ -128,7 +127,7 @@ app.get('/urls/:shortURL', (req, res) => {
   let templateVars = {
     user: users[req.session.user_id],
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL]
+    longURL: urlDatabase[req.params.shortURL].longURL
   };
   res.render('urls_show.ejs', templateVars);
 });
